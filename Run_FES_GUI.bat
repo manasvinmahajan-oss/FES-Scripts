@@ -1,73 +1,38 @@
 @echo off
 REM ====================================================================
-REM FES Bids Manager - Direct Launcher
-REM Double-click this file to launch the GUI without opening Anaconda
+REM FES Bids Manager - Launcher
+REM Uses the correct Anaconda Python installation
 REM ====================================================================
 
 title FES Bids Manager
 
-echo.
-echo ========================================
-echo   Starting FES Bids Manager...
-echo ========================================
-echo.
-
-REM Change to the script directory (where this .bat file is located)
+REM Change to the script directory
 cd /d "%~dp0"
 
-REM Try to find and use Anaconda Python directly
-set "ANACONDA_PATH=%USERPROFILE%\anaconda3"
-set "ANACONDA_PATH2=C:\Users\enrolment\AppData\Local\anaconda3"
-set "ANACONDA_PATH3=C:\ProgramData\Anaconda3"
+REM Check if Python file exists
+if not exist "FES_Bids_Runner_PRODUCTION.py" (
+    echo ERROR: FES_Bids_Runner_PRODUCTION.py not found!
+    echo Make sure all Python files are in the same folder as this .bat file
+    pause
+    exit /b 1
+)
 
-REM Check which Anaconda installation exists and run directly
-if exist "%ANACONDA_PATH%\python.exe" (
-    echo Found Anaconda at: %ANACONDA_PATH%
-    echo Launching GUI...
+REM Use the correct Anaconda Python path
+set "PYTHON_PATH=C:\Users\enrolment\AppData\Local\anaconda3\pythonw.exe"
+
+REM Check if Python exists at this location
+if not exist "%PYTHON_PATH%" (
+    echo ERROR: Python not found at expected location:
+    echo %PYTHON_PATH%
     echo.
-    start "" "%ANACONDA_PATH%\pythonw.exe" FES_Bids_Runner_PRODUCTION.py
-    exit
+    echo Anaconda may have been reinstalled or moved.
+    echo Please contact support.
+    pause
+    exit /b 1
 )
 
-if exist "%ANACONDA_PATH2%\python.exe" (
-    echo Found Anaconda at: %ANACONDA_PATH2%
-    echo Launching GUI...
-    echo.
-    start "" "%ANACONDA_PATH2%\pythonw.exe" FES_Bids_Runner_PRODUCTION.py
-    exit
-)
+REM Launch the GUI silently (no console window after this)
+start "" "%PYTHON_PATH%" FES_Bids_Runner_PRODUCTION.py
 
-if exist "%ANACONDA_PATH3%\python.exe" (
-    echo Found Anaconda at: %ANACONDA_PATH3%
-    echo Launching GUI...
-    echo.
-    start "" "%ANACONDA_PATH3%\pythonw.exe" FES_Bids_Runner_PRODUCTION.py
-    exit
-)
-
-REM If Anaconda not found at default locations, try system Python
-echo Anaconda not found at default locations.
-echo Trying system Python...
-echo.
-
-where python >nul 2>&1
-if %ERRORLEVEL% equ 0 (
-    start "" pythonw.exe FES_Bids_Runner_PRODUCTION.py
-    exit
-)
-
-REM If nothing works, show error
-echo.
-echo ========================================
-echo   ERROR: Could not find Python
-echo ========================================
-echo.
-echo Please ensure Anaconda or Python is installed.
-echo.
-echo Expected Anaconda locations:
-echo   - %USERPROFILE%\anaconda3
-echo   - C:\Users\enrolment\AppData\Local\anaconda3
-echo   - C:\ProgramData\Anaconda3
-echo.
-pause
-exit /b 1
+REM Exit immediately (console window closes)
+exit
